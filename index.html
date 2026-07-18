@@ -59,6 +59,7 @@
     display:flex; align-items:center; justify-content:center; font-weight:700; font-size:14px; flex-shrink:0;
   }
   .option.selected .option-badge{background:var(--blue);}
+  .option-badge-square{border-radius:8px; font-size:16px;}
   .nav-buttons{display:flex; justify-content:space-between; align-items:center; margin-top:16px;}
   #violation-banner{
     position:fixed; top:0; left:0; right:0; background:var(--red); color:#fff;
@@ -99,25 +100,32 @@
 
   /* ---- Question navigator (palette) ---- */
   #question-nav{
-    position:fixed; top:110px; right:24px; width:190px; background:#fff; border:1px solid var(--border);
-    border-radius:14px; padding:14px; box-shadow:0 6px 24px rgba(20,40,60,.12); z-index:500;
+    position:fixed; top:100px; right:24px; width:250px; background:#fff; border:1px solid var(--border);
+    border-radius:16px; padding:20px; box-shadow:0 8px 28px rgba(20,40,60,.14); z-index:500;
   }
-  #question-nav h4{margin:0 0 10px; font-size:12px; color:var(--muted); letter-spacing:.5px; text-transform:uppercase;}
-  .nav-grid{display:grid; grid-template-columns:repeat(5,1fr); gap:6px;}
+  .nav-header{display:flex; justify-content:space-between; align-items:baseline; margin-bottom:14px;}
+  #question-nav h4{margin:0; font-size:11.5px; color:var(--muted); letter-spacing:.6px; text-transform:uppercase;}
+  .nav-progress{font-size:12.5px; font-weight:700; color:var(--blue); white-space:nowrap;}
+  .nav-grid{display:grid; grid-template-columns:repeat(5,1fr); gap:9px; margin-bottom:18px; max-height:260px; overflow-y:auto; padding:2px;}
   .nav-dot{
-    width:30px; height:30px; border-radius:8px; border:1.5px solid var(--border); background:#fff;
-    display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:var(--muted);
-    cursor:pointer;
+    aspect-ratio:1; border-radius:10px; border:1.5px solid var(--border); background:#fff;
+    display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:var(--muted);
+    cursor:pointer; transition:transform .12s, border-color .12s;
   }
+  .nav-dot:hover{ transform:scale(1.08); border-color:var(--teal); }
   .nav-dot.answered{background:#E7FBF5; border-color:var(--mint); color:#0b6b52;}
   .nav-dot.current{background:var(--navy); border-color:var(--navy); color:#fff;}
-  .nav-legend{display:flex; flex-direction:column; gap:6px; margin-top:12px; font-size:11px; color:var(--muted);}
-  .legend-item{display:flex; align-items:center; gap:6px;}
-  .legend-swatch{width:12px; height:12px; border-radius:3px; border:1.5px solid var(--border); display:inline-block;}
-  #btnSubmitTop{width:100%; margin-top:12px;}
+  .nav-legend{display:flex; flex-direction:column; gap:9px; margin-bottom:18px; font-size:12px; color:var(--muted);}
+  .legend-item{display:flex; align-items:center; gap:9px;}
+  .legend-swatch{width:15px; height:15px; border-radius:5px; border:1.5px solid var(--border); display:inline-block; flex-shrink:0;}
+  .legend-current{background:var(--navy); border-color:var(--navy);}
+  .legend-answered{background:#E7FBF5; border-color:var(--mint);}
+  .legend-empty{background:#fff;}
+  #btnSubmitTop{width:100%;}
 
   @media (max-width:880px){
     #question-nav{position:static; width:100%; margin-bottom:16px; order:-1;}
+    .nav-grid{max-height:none;}
   }
 
   /* ---- Confirm modal ---- */
@@ -193,12 +201,15 @@
   <!-- ===== SCREEN 1: QUIZ ===== -->
   <section id="screen-quiz" class="hidden">
     <div id="question-nav">
-      <h4>Danh sách câu hỏi</h4>
+      <div class="nav-header">
+        <h4>Danh sách câu hỏi</h4>
+        <span class="nav-progress" id="navProgress">0/25</span>
+      </div>
       <div class="nav-grid" id="navGrid"></div>
       <div class="nav-legend">
-        <div class="legend-item"><span class="legend-swatch" style="background:var(--navy); border-color:var(--navy);"></span> Đang làm</div>
-        <div class="legend-item"><span class="legend-swatch" style="background:#E7FBF5; border-color:var(--mint);"></span> Đã trả lời</div>
-        <div class="legend-item"><span class="legend-swatch" style="background:#fff;"></span> Chưa trả lời</div>
+        <div class="legend-item"><span class="legend-swatch legend-current"></span> Đang làm</div>
+        <div class="legend-item"><span class="legend-swatch legend-answered"></span> Đã trả lời</div>
+        <div class="legend-item"><span class="legend-swatch legend-empty"></span> Chưa trả lời</div>
       </div>
       <button class="btn btn-mint" id="btnSubmitTop">Nộp bài</button>
     </div>
@@ -211,7 +222,8 @@
     <div class="card">
       <div style="font-size:12px; font-weight:700; color:var(--teal); letter-spacing:1px; margin-bottom:6px;" id="qTopic">NGHIỆP VỤ</div>
       <h2 id="qText" style="font-size:19px; line-height:1.4;"></h2>
-      <div id="qOptions" style="margin-top:20px;"></div>
+      <div id="qMultiHint" class="hidden" style="display:inline-block; background:#FFF4D6; color:#8a5a00; font-size:11.5px; font-weight:700; padding:4px 10px; border-radius:20px; margin-bottom:10px;">CÓ THỂ CHỌN NHIỀU ĐÁP ÁN</div>
+      <div id="qOptions" style="margin-top:12px;"></div>
       <div class="nav-buttons">
         <button class="btn btn-ghost" id="btnPrev">← Câu trước</button>
         <button class="btn btn-primary" id="btnNext">Câu tiếp theo →</button>
@@ -255,7 +267,7 @@
    CẤU HÌNH — chỉnh sau khi deploy Google Apps Script
    ============================================================ */
 const CONFIG = {
-  APPS_SCRIPT_URL: "https://script.google.com/macros/s/AKfycby5GzddSkiowC-xsySPyqncePpdqu0VVW4O2ZrCORONNbkBtyet58NQ_OqNRsEVk4HP-Q/exec", // vd: https://script.google.com/macros/s/XXXX/exec
+  APPS_SCRIPT_URL: "PASTE_YOUR_APPS_SCRIPT_WEBAPP_URL_HERE", // vd: https://script.google.com/macros/s/XXXX/exec
   TIME_LIMIT_SECONDS: 25 * 60,   // tổng thời gian làm bài
   MAX_VIOLATIONS: 3,             // số lần vi phạm tối đa trước khi tự nộp
   QUESTIONS_PER_ATTEMPT: 25      // số câu lấy ra mỗi lượt (<= tổng số câu trong ngân hàng)
@@ -266,12 +278,12 @@ const CONFIG = {
    ============================================================ */
 const REGIONS = {
   "Vùng 1": ["Kim Giang","Thanh Hóa","Nguyễn Xiển","Linh Đàm","Tây Hồ","Nguyễn Tuân","Hoàng Đạo Thúy","Hoàng Quốc Việt","Trung Văn"],
-  "Vùng của Liên": ["Hải Dương","Vĩnh Phúc","Long Biên","Vĩnh Phúc 3","Phúc Yên","Việt Trì","Mỹ Đình","Vinhomes Gardenia"],
-  "Vùng 3": ["Times City","Văn Khê","An Khánh","Vinhomes Smart City","Vinhomes Smart City 2","Dương Nội","Phạm Văn Đồng","Thái Bình"],
-  "Vùng 5": ["Từ Sơn","Hải Phòng 2","Hải Phòng","Bắc Ninh","Bắc Ninh 2","Bắc Giang"],
-  "Vùng 6": ["Sài Đồng","Vinh","Ocean Park","Trường Chinh","Định Công"],
+  "Vùng 3": ["Times City","Văn Khê","An Khánh","Vinhomes Smart City","Vinhomes Smart City 2","Dương Nội","Phạm Văn Đồng","Thái Bình","Vĩnh Phúc","Vĩnh Phúc 3"],
+  "Vùng 5": ["Từ Sơn","Hải Phòng 2","Hải Phòng","Bắc Ninh","Bắc Ninh 2","Bắc Giang","Hải Dương","Mỹ Đình","Phúc Yên"],
+  "Vùng 6": ["Sài Đồng","Vinh","Ocean Park","Trường Chinh","Định Công","Long Biên","Việt Trì"],
   "Vùng 7": ["Đà Nẵng","Đà Nẵng 2","Phan Văn Trị"],
-  "Vùng 8": ["Celadon - Tân Phú","Phạm Văn Chiêu","Grand Park"]
+  "Vùng 8": ["Celadon - Tân Phú","Phạm Văn Chiêu","Grand Park"],
+  "Vùng TL": ["Vinhomes Gardenia"]
 };
 const BRANCH_PREFIX = "Scots English ";
 
@@ -279,112 +291,171 @@ const BRANCH_PREFIX = "Scots English ";
    NGÂN HÀNG CÂU HỎI
    ============================================================ */
 const QUESTION_BANK = [
-  { topic:"Attendance – Điểm danh", q:"AS/AF cần kiểm tra tỉ lệ điểm danh (Attendance/Absent/Late) của toàn bộ lớp trong tháng vừa qua. Mục nào trên LMS cần truy cập để thực hiện việc này?",
-    options:["Student Counseling → Class Info → Students","Report → Student → Attendance","Report → Grade → Weekly Grade","Student Counseling → Student Info"], answer:1 },
-  { topic:"Attendance – Điểm danh", q:"Giáo viên không thể điểm danh cho buổi học, nguyên nhân thường gặp nhất là gì?",
-    options:["Chưa chọn nút Check-in trước 2 giờ so với giờ học","Giáo viên chưa được add vào lớp","Giáo viên chưa được cấp tài khoản trên LMS","Do giáo viên không điểm danh trong quá trình học"], answer:0 },
-  { topic:"Attendance – Điểm danh", q:"Giáo viên phản ánh không thấy lớp trên LMS để điểm danh. AS/AF cần kiểm tra những gì?",
-    options:[
-      "Giáo viên đã được add đúng chi nhánh/lớp/buổi học chưa (lịch ngày tương lai chỉ hiện đúng ngày; nếu có giáo viên cover cần add đúng buổi/lớp); đồng thời lưu ý nút Check-in chỉ xuất hiện trước 2 giờ so với giờ học",
-      "Chờ đến đúng giờ học, hệ thống sẽ tự động hiển thị lớp",
-      "Yêu cầu giáo viên cài đặt lại ứng dụng LMS trên điện thoại",
-      "Kiểm tra lớp đã đủ sĩ số tối thiểu chưa"
-    ], answer:0 },
-
-  { topic:"Check BTVN – Weekly Grade", q:"Muốn kiểm tra tình trạng làm bài tập về nhà (BTVN) của học viên, AS/AF cần kiểm tra ở đâu?",
-    options:["Report → Grade → Weekly Grade","Report → Student → Attendance","Report → Grade → Test Score","Student Counseling → Student Info"], answer:0 },
-  { topic:"Check BTVN – Weekly Grade", q:"AS/AF có thể kiểm tra tình trạng làm bài tập về nhà của học viên bằng bao nhiêu cách, và đó là (các) cách nào?",
-    options:["1 cách: chỉ qua Weekly Grade","2 cách: Report → Grade → Weekly Grade và Student Counseling → Class Info → Learning Point","3 cách: Weekly Grade, Learning Point và Test Score","Không có cách cố định, tuỳ AS/AF tự kiểm tra"], answer:1 },
-
-  { topic:"Review not Graded", q:"Tính năng Review not Graded hiện đang áp dụng cho phạm vi nào?",
-    options:["Tất cả chương trình CK English","Chỉ từ CK English 3 trở lên","Chỉ CK English 1 và 2","Áp dụng cho mọi chương trình, không giới hạn"], answer:1 },
-
-  { topic:"Nhập điểm c-Learning", q:"Học viên chưa làm bài nào trong tuần thì điểm Homework Completion là bao nhiêu?",
-    options:["3 điểm","2 điểm","0 điểm","Không nhập điểm"], answer:2 },
-  { topic:"Nhập điểm c-Learning", q:"Khi nhập điểm Homework Completion cho một học viên MỚI tham gia vào buổi học hôm đó, AF cần thao tác thêm gì trước khi Save?",
-    options:["Tick chọn \"New\"","Đổi Learning Type","Xoá lịch sử điểm cũ","Không cần thao tác gì thêm"], answer:0 },
-  { topic:"Nhập điểm c-Learning", q:"Khi kiểm tra điểm c-Learning, để đảm bảo xem đúng buổi học cần kiểm tra, AS/AF cần xem ở đâu?",
-    options:["File hướng dẫn xem điểm i-Learning","CRM","Lịch dạy của giáo viên","Nhóm Zalo lớp học"], answer:0 },
-
-  { topic:"Lesson Quiz", q:"Lesson Quiz diễn ra ở buổi học số 4 theo CRM. Theo quy tắc nhập lùi 1 buổi, giáo viên cần nhập điểm tại Lecture nào trên LMS?",
-    options:["Lecture 3","Lecture 4","Lecture 5","Lecture 8"], answer:0 },
-  { topic:"Lesson Quiz", q:"Giáo viên có tối đa bao nhiêu giờ để hoàn thành nhập điểm Lesson Quiz sau khi buổi học kết thúc?",
-    options:["24 giờ","48 giờ","72 giờ","5 ngày"], answer:1 },
-  { topic:"Lesson Quiz", q:"Giáo viên phản ánh không thấy chỗ nhập điểm Lesson Quiz/Book Test. Nguyên nhân thường gặp nhất là gì?",
-    options:[
-      "Điểm cần nhập lùi 1 buổi so với ngày thực hiện bài test; nếu giáo viên dạy chính nghỉ buổi Quiz và có giáo viên cover dạy thay, cần hoãn bài Quiz để buổi sau giáo viên dạy chính test và dùng tài khoản AS nhập điểm — hoặc nếu giáo viên cover thực hiện Quiz thì AS/AF hỗ trợ nhập điểm lên LMS",
-      "Hệ thống LMS đang bảo trì nên tạm thời ẩn mục nhập điểm",
-      "Cần đổi Learning Type sang c-Learning để hiện điểm",
-      "Cần xoá buổi học cũ và tạo lại lịch mới"
-    ], answer:0 },
-
-  { topic:"Comment / Report", q:"Để phụ huynh xem được comment của giáo viên trên Learning Portal, AS/AF cần làm gì?",
-    options:["Dịch comment của giáo viên và chọn Consultation Type = Learning Portal Comments, Status = Open","Chỉ cần dịch comment, không cần đổi Status","Đổi Status = Closed để lưu nội bộ trước","Không cần làm gì, hệ thống tự hiển thị"], answer:0 },
-  { topic:"Comment / Report", q:"Giáo viên có tối đa bao nhiêu giờ để hoàn thành Progress Comment (tại buổi 12 và buổi 36)?",
-    options:["24 giờ","48 giờ","5 ngày","10 ngày"], answer:0 },
-
-  { topic:"Grade / Test Score", q:"Giáo viên có trách nhiệm nhập những gì lên LMS?",
-    options:["Lesson Quiz, Book Test, Comment định kỳ","Chỉ Lesson Quiz","Điểm danh và Homework Completion","Midterm và Final Test"], answer:0 },
-  { topic:"Grade / Test Score", q:"Ai là người nhập điểm Midterm/Final trong thời điểm hiện tại?",
-    options:["Chỉ giáo viên","Chỉ AF","Giáo viên và AF – AF hỗ trợ khi giáo viên không nhập kịp thời hoặc gặp vấn đề không nhập điểm được","Học viên tự nhập"], answer:2 },
-  { topic:"Grade / Test Score", q:"Thời hạn nhập điểm Midterm Test / Final Test là bao lâu?",
-    options:["48 giờ cho cả giáo viên và AF","24 giờ (giáo viên) và 48 giờ (AF)","5 ngày (giáo viên) và 10 ngày (AF)","Không quy định thời hạn cụ thể"], answer:2 },
-
-  { topic:"Onboarding & Tài khoản giáo viên", q:"Muốn tạo tài khoản LMS cho giáo viên, quy trình thực hiện đúng là gì?",
-    options:[
-      "Chi nhánh báo thông tin giáo viên cho TRM trước; IT tạo tài khoản LMS dựa trên danh sách TRM gửi, chỉ tạo khi tên giáo viên đã có trong file tăng giảm",
-      "AS/AF tự tạo tài khoản trực tiếp trên LMS cho giáo viên mới",
-      "Giáo viên tự đăng ký tài khoản qua Learning Portal",
-      "IT tạo tài khoản ngay khi nhận thông tin từ chi nhánh, không cần đối chiếu file tăng giảm"
-    ], answer:0 },
-
-  { topic:"i-Learning – i-Create", q:"Giáo viên phản ánh không chấm được bài i-Create trên i-Learning. Nguyên nhân là gì?",
-    options:[
-      "Đã quá thời hạn chấm bài — giáo viên chỉ được chấm trong vòng 14 ngày kể từ khi học viên thực hiện bài i-Create",
-      "Học viên chưa nộp đủ file bài làm",
-      "Giáo viên chưa được cấp quyền chấm bài i-Create",
-      "Bài i-Create chỉ chấm được trên máy tính, không chấm được trên điện thoại"
-    ], answer:0 },
-
-  { topic:"i-Learning – Tiến độ Syllabus", q:"Học viên phản ánh không chuyển sang được sách/quyển tiếp theo trong i-Learning. AS/AF cần kiểm tra gì?",
-    options:[
-      "Kiểm tra lớp đã học đến Lecture/Session tương ứng chưa — nội dung chỉ mở khoá theo tiến độ Syllabus, chưa đến buổi thì sách/quyển tiếp theo chưa Unlock",
-      "Yêu cầu học viên đăng xuất và đăng nhập lại tài khoản",
-      "Kiểm tra học viên đã đạt đủ điểm Homework Completion chưa",
-      "Chỉ AF mới có quyền mở khoá sách/quyển tiếp theo cho học viên"
-    ], answer:0 },
-
-  { topic:"Withdraw học viên", q:"Học viên bị Withdraw ra khỏi lớp, khi add lại vào cùng lớp cũ thì lịch sử làm bài và điểm số sẽ như thế nào?",
-    options:[
-      "Vẫn xem được các bài đã làm trước đó, nhưng không xem được và không làm bù được các bài trong giai đoạn Withdraw",
-      "Toàn bộ lịch sử làm bài và điểm số bị xoá vĩnh viễn",
-      "Học viên có thể làm bù toàn bộ các bài đã bỏ lỡ trong giai đoạn Withdraw",
-      "Chỉ mất điểm Test Score, các bài Homework vẫn giữ nguyên"
-    ], answer:0 },
-
-  { topic:"Tình huống tổng hợp", q:"AF Lan làm 4 việc sau: (1) lọc Learning Type = c-Learning để xem bài i-Learning; (2) bỏ qua Unmarked Count vì nghĩ giáo viên tự xử lý; (3) để Status = Closed sau khi dịch comment; (4) nhập 2 điểm cho học viên thiếu 1 bài. Bước nào thực hiện ĐÚNG?",
-    options:["Bước (1)","Bước (2)","Bước (3)","Bước (4)"], answer:3 },
-  { topic:"Tình huống tổng hợp", q:"AS nhận phản ánh: giáo viên dạy thay (cover) đã đăng nhập đúng giờ nhưng chưa thấy lớp để điểm danh. AS kiểm tra thấy giáo viên cover đã được add đúng chi nhánh và lớp, tuy nhiên hiện tại còn hơn 2 giờ nữa mới đến giờ học. Nguyên nhân hợp lý nhất là gì?",
-    options:[
-      "Nút Check-in chỉ xuất hiện trước 2 giờ so với giờ học, nên còn hơn 2 giờ thì chưa thấy là bình thường",
-      "Giáo viên cover chưa được cấp tài khoản LMS",
-      "Lớp học chưa đủ sĩ số tối thiểu",
-      "Giáo viên cần đổi Learning Type sang c-Learning"
-    ], answer:0 },
-  { topic:"Tình huống tổng hợp", q:"Xét theo đúng deadline quy định, đầu việc nào dưới đây bị xem là TRỄ HẠN?",
-    options:[
-      "Giáo viên nhập điểm Lesson Quiz sau 40 giờ kể từ khi buổi học kết thúc",
-      "Giáo viên viết Progress Comment cho buổi 12 sau 30 giờ kể từ khi buổi học kết thúc",
-      "Giáo viên nhập điểm Final Test sau 4 ngày",
-      "AF nhập lại điểm Final Test trên CRM sau 8 ngày"
-    ], answer:1 },
-  { topic:"Tình huống tổng hợp", q:"Một AS mới cần phân biệt hai tính năng Weekly Grade và Review not Graded. Mô tả nào sau đây ĐÚNG về sự khác biệt giữa hai tính năng này?",
-    options:[
-      "Weekly Grade cho biết học viên đã nộp bài và được chấm hay chưa theo từng tuần; Review not Graded chỉ liệt kê các lớp còn bài chưa chấm (từ CK English 3 trở lên) để xử lý nhanh",
-      "Cả hai tính năng đều chỉ áp dụng cho chương trình CK English 3 trở lên",
-      "Review not Graded dùng để nhập điểm Homework Completion, còn Weekly Grade chỉ dùng để xem điểm danh",
-      "Hai tính năng hoàn toàn giống nhau, chỉ khác tên gọi"
-    ], answer:0 },
+  { topic:"Attendance – Điểm danh", q:"AS/AF cần kiểm tra tỉ lệ điểm danh (Attendance/Absent/Late) của toàn bộ lớp trong tháng vừa qua. Mục nào trên LMS cần truy cập để thực hiện việc này?", type:"multi",
+      options:[
+        "Student Counseling → Class Info → Students",
+        "Report → Student → Attendance",
+        "Report → Grade → Weekly Grade",
+        "Student Counseling → Student Info"
+      ], answer:[1] },
+  { topic:"Attendance – Điểm danh", q:"Trong các nguyên nhân dưới đây, đâu là nguyên nhân có thể khiến giáo viên không điểm danh được buổi học?", type:"multi",
+      options:[
+        "Chưa chọn nút Check-in trước 2 giờ so với giờ học",
+        "Giáo viên chưa được add vào lớp",
+        "Giáo viên chưa được cấp tài khoản trên LMS",
+        "Do giáo viên không điểm danh trong quá trình học"
+      ], answer:[0] },
+  { topic:"Attendance – Điểm danh", q:"Giáo viên phản ánh không thấy lớp trên LMS để điểm danh. AS/AF cần kiểm tra những gì?", type:"multi",
+      options:[
+        "Giáo viên đã được add đúng chi nhánh/lớp/buổi học chưa (lịch ngày tương lai chỉ hiện đúng ngày; nếu có giáo viên cover cần add đúng buổi/lớp); đồng thời lưu ý nút Check-in chỉ xuất hiện trước 2 giờ so với giờ học",
+        "Chờ đến đúng giờ học, hệ thống sẽ tự động hiển thị lớp",
+        "Yêu cầu giáo viên cài đặt lại ứng dụng LMS trên điện thoại",
+        "Kiểm tra lớp đã đủ sĩ số tối thiểu chưa"
+      ], answer:[0] },
+  { topic:"Check BTVN – Weekly Grade", q:"Muốn kiểm tra tình trạng làm bài tập về nhà (BTVN) của học viên, AS/AF cần kiểm tra ở đâu?", type:"multi",
+      options:[
+        "Report → Grade → Weekly Grade",
+        "Report → Student → Attendance",
+        "Report → Grade → Test Score",
+        "Student Counseling → Student Info"
+      ], answer:[0] },
+  { topic:"Check BTVN – Weekly Grade", q:"AS/AF có thể kiểm tra tình trạng làm bài tập về nhà của học viên bằng bao nhiêu cách, và đó là (các) cách nào?", type:"multi",
+      options:[
+        "1 cách: chỉ qua Weekly Grade",
+        "2 cách: Report → Grade → Weekly Grade và Student Counseling → Class Info → Learning Point",
+        "3 cách: Weekly Grade, Learning Point và Test Score",
+        "Không có cách cố định, tuỳ AS/AF tự kiểm tra"
+      ], answer:[1] },
+  { topic:"Review not Graded", q:"Tính năng Review not Graded hiện đang áp dụng cho phạm vi nào?", type:"multi",
+      options:[
+        "Tất cả chương trình CK English",
+        "Chỉ từ CK English 3 trở lên",
+        "Chỉ CK English 1 và 2",
+        "Áp dụng cho mọi chương trình, không giới hạn"
+      ], answer:[1] },
+  { topic:"Nhập điểm c-Learning", q:"Học viên chưa làm bài nào trong tuần thì điểm Homework Completion là bao nhiêu?", type:"multi",
+      options:["3 điểm","2 điểm","0 điểm","Không nhập điểm"], answer:[2] },
+  { topic:"Nhập điểm c-Learning", q:"Khi nhập điểm Homework Completion cho một học viên MỚI tham gia vào buổi học hôm đó, AF cần thao tác thêm gì trước khi Save?", type:"multi",
+      options:[
+        "Tick chọn \"New\"",
+        "Đổi Learning Type",
+        "Xoá lịch sử điểm cũ",
+        "Không cần thao tác gì thêm"
+      ], answer:[0] },
+  { topic:"Nhập điểm c-Learning", q:"Khi kiểm tra điểm c-Learning, để đảm bảo xem đúng buổi học cần kiểm tra, AS/AF cần xem ở đâu?", type:"multi",
+      options:[
+        "File hướng dẫn xem điểm i-Learning",
+        "CRM",
+        "Lịch dạy của giáo viên",
+        "Nhóm Zalo lớp học"
+      ], answer:[0] },
+  { topic:"Lesson Quiz", q:"Lesson Quiz diễn ra ở buổi học số 4 theo CRM. Theo quy tắc nhập lùi 1 buổi, giáo viên cần nhập điểm tại Lecture nào trên LMS?", type:"multi",
+      options:[
+        "Lecture 3",
+        "Lecture 4",
+        "Lecture 5",
+        "Lecture 8"
+      ], answer:[0] },
+  { topic:"Lesson Quiz", q:"Giáo viên có tối đa bao nhiêu giờ để hoàn thành nhập điểm Lesson Quiz sau khi buổi học kết thúc?", type:"multi",
+      options:[
+        "24 giờ",
+        "48 giờ",
+        "72 giờ",
+        "5 ngày"
+      ], answer:[1] },
+  { topic:"Lesson Quiz", q:"Giáo viên phản ánh không thấy chỗ nhập điểm Lesson Quiz/Book Test. Nguyên nhân thường gặp nhất là gì?", type:"multi",
+      options:[
+        "Điểm cần nhập lùi 1 buổi so với ngày thực hiện bài test; nếu giáo viên dạy chính nghỉ buổi Quiz và có giáo viên cover dạy thay, cần hoãn bài Quiz để buổi sau giáo viên dạy chính test và dùng tài khoản AS nhập điểm — hoặc nếu giáo viên cover thực hiện Quiz thì AS/AF hỗ trợ nhập điểm lên LMS",
+        "Hệ thống LMS đang bảo trì nên tạm thời ẩn mục nhập điểm",
+        "Cần đổi Learning Type sang c-Learning để hiện điểm",
+        "Cần xoá buổi học cũ và tạo lại lịch mới"
+      ], answer:[0] },
+  { topic:"Comment / Report", q:"Để phụ huynh xem được comment của giáo viên trên Learning Portal, AS/AF cần làm gì?", type:"multi",
+      options:[
+        "Dịch comment của giáo viên và chọn Consultation Type = Learning Portal Comments, Status = Open",
+        "Chỉ cần dịch comment, không cần đổi Status",
+        "Đổi Status = Closed để lưu nội bộ trước",
+        "Không cần làm gì, hệ thống tự hiển thị"
+      ], answer:[0] },
+  { topic:"Comment / Report", q:"Giáo viên có tối đa bao nhiêu giờ để hoàn thành Progress Comment (tại buổi 12 và buổi 36)?", type:"multi",
+      options:["24 giờ","48 giờ","5 ngày","10 ngày"], answer:[0] },
+  { topic:"Grade / Test Score", q:"Giáo viên có trách nhiệm nhập những gì lên LMS?", type:"multi",
+      options:[
+        "Lesson Quiz, Book Test, Comment định kỳ",
+        "Chỉ Lesson Quiz",
+        "Điểm danh và Homework Completion",
+        "Midterm và Final Test"
+      ], answer:[0] },
+  { topic:"Grade / Test Score", q:"Ai là người nhập điểm Midterm/Final trong thời điểm hiện tại?", type:"multi",
+      options:[
+        "Chỉ giáo viên",
+        "Chỉ AF",
+        "Giáo viên và AF – AF hỗ trợ khi giáo viên không nhập kịp thời hoặc gặp vấn đề không nhập điểm được",
+        "Học viên tự nhập"
+      ], answer:[2] },
+  { topic:"Grade / Test Score", q:"Thời hạn nhập điểm Midterm Test / Final Test là bao lâu?", type:"multi",
+      options:[
+        "48 giờ cho cả giáo viên và AF",
+        "24 giờ (giáo viên) và 48 giờ (AF)",
+        "5 ngày (giáo viên) và 10 ngày (AF)",
+        "Không quy định thời hạn cụ thể"
+      ], answer:[2] },
+  { topic:"Onboarding & Tài khoản giáo viên", q:"Muốn tạo tài khoản LMS cho giáo viên, quy trình thực hiện đúng là gì?", type:"multi",
+      options:[
+        "Chi nhánh báo thông tin giáo viên cho TRM trước; IT tạo tài khoản LMS dựa trên danh sách TRM gửi, chỉ tạo khi tên giáo viên đã có trong file tăng giảm",
+        "AS/AF tự tạo tài khoản trực tiếp trên LMS cho giáo viên mới",
+        "Giáo viên tự đăng ký tài khoản qua Learning Portal",
+        "IT tạo tài khoản ngay khi nhận thông tin từ chi nhánh, không cần đối chiếu file tăng giảm"
+      ], answer:[0] },
+  { topic:"i-Learning – i-Create", q:"Giáo viên phản ánh không chấm được bài i-Create trên i-Learning. Nguyên nhân là gì?", type:"multi",
+      options:[
+        "Đã quá thời hạn chấm bài — giáo viên chỉ được chấm trong vòng 14 ngày kể từ khi học viên thực hiện bài i-Create",
+        "Học viên chưa nộp đủ file bài làm",
+        "Giáo viên chưa được cấp quyền chấm bài i-Create",
+        "Bài i-Create chỉ chấm được trên máy tính, không chấm được trên điện thoại"
+      ], answer:[0] },
+  { topic:"i-Learning – Tiến độ Syllabus", q:"Học viên phản ánh không chuyển sang được sách/quyển tiếp theo trong i-Learning. AS/AF cần kiểm tra gì?", type:"multi",
+      options:[
+        "Kiểm tra lớp đã học đến Lecture/Session tương ứng chưa — nội dung chỉ mở khoá theo tiến độ Syllabus, chưa đến buổi thì sách/quyển tiếp theo chưa Unlock",
+        "Yêu cầu học viên đăng xuất và đăng nhập lại tài khoản",
+        "Kiểm tra học viên đã đạt đủ điểm Homework Completion chưa",
+        "Chỉ AF mới có quyền mở khoá sách/quyển tiếp theo cho học viên"
+      ], answer:[0] },
+  { topic:"Withdraw học viên", q:"Học viên bị Withdraw ra khỏi lớp, khi add lại vào cùng lớp cũ thì lịch sử làm bài và điểm số sẽ như thế nào?", type:"multi",
+      options:[
+        "Vẫn xem được các bài đã làm trước đó, nhưng không xem được và không làm bù được các bài trong giai đoạn Withdraw",
+        "Toàn bộ lịch sử làm bài và điểm số bị xoá vĩnh viễn",
+        "Học viên có thể làm bù toàn bộ các bài đã bỏ lỡ trong giai đoạn Withdraw",
+        "Chỉ mất điểm Test Score, các bài Homework vẫn giữ nguyên"
+      ], answer:[0] },
+  { topic:"Tình huống tổng hợp", q:"AF Lan làm 4 việc sau: (1) lọc Learning Type = c-Learning để xem bài i-Learning; (2) bỏ qua Unmarked Count vì nghĩ giáo viên tự xử lý; (3) để Status = Closed sau khi dịch comment; (4) nhập 2 điểm cho học viên thiếu 1 bài. Bước nào thực hiện ĐÚNG?", type:"multi",
+      options:[
+        "Bước (1)",
+        "Bước (2)",
+        "Bước (3)",
+        "Bước (4)"
+      ], answer:[3] },
+  { topic:"Tình huống tổng hợp", q:"AS nhận phản ánh: giáo viên dạy thay (cover) đã đăng nhập đúng giờ nhưng chưa thấy lớp để điểm danh. AS kiểm tra thấy giáo viên cover đã được add đúng chi nhánh và lớp, tuy nhiên hiện tại còn hơn 2 giờ nữa mới đến giờ học. Nguyên nhân hợp lý nhất là gì?", type:"multi",
+      options:[
+        "Nút Check-in chỉ xuất hiện trước 2 giờ so với giờ học, nên còn hơn 2 giờ thì chưa thấy là bình thường",
+        "Giáo viên cover chưa được cấp tài khoản LMS",
+        "Lớp học chưa đủ sĩ số tối thiểu",
+        "Giáo viên cần đổi Learning Type sang c-Learning"
+      ], answer:[0] },
+  { topic:"Tình huống tổng hợp", q:"Xét theo đúng deadline quy định, đầu việc nào dưới đây bị xem là TRỄ HẠN?", type:"multi",
+      options:[
+        "Giáo viên nhập điểm Lesson Quiz sau 40 giờ kể từ khi buổi học kết thúc",
+        "Giáo viên viết Progress Comment cho buổi 12 sau 30 giờ kể từ khi buổi học kết thúc",
+        "Giáo viên nhập điểm Final Test sau 4 ngày",
+        "AF nhập lại điểm Final Test trên CRM sau 8 ngày"
+      ], answer:[1] },
+  { topic:"Tình huống tổng hợp", q:"Một AS mới cần phân biệt hai tính năng Weekly Grade và Review not Graded. Mô tả nào sau đây ĐÚNG về sự khác biệt giữa hai tính năng này?", type:"multi",
+      options:[
+        "Weekly Grade cho biết học viên đã nộp bài và được chấm hay chưa theo từng tuần; Review not Graded chỉ liệt kê các lớp còn bài chưa chấm (từ CK English 3 trở lên) để xử lý nhanh",
+        "Cả hai tính năng đều chỉ áp dụng cho chương trình CK English 3 trở lên",
+        "Review not Graded dùng để nhập điểm Homework Completion, còn Weekly Grade chỉ dùng để xem điểm danh",
+        "Hai tính năng hoàn toàn giống nhau, chỉ khác tên gọi"
+      ], answer:[0] },
 ];
 
 /* ============================================================
@@ -406,9 +477,19 @@ function prepareQuestions(){
   const picked = shuffle(QUESTION_BANK).slice(0, n);
   state.questions = picked.map(orig => {
     const optOrder = shuffle(orig.options.map((text,i)=>({text,i})));
-    const newAnswerIndex = optOrder.findIndex(o => o.i === orig.answer);
-    return { topic:orig.topic, q:orig.q, options:optOrder.map(o=>o.text), answer:newAnswerIndex };
+    const isMulti = orig.type === 'multi';
+    let newAnswer;
+    if(isMulti){
+      newAnswer = orig.answer.map(origIdx => optOrder.findIndex(o => o.i === origIdx)).sort((a,b)=>a-b);
+    } else {
+      newAnswer = optOrder.findIndex(o => o.i === orig.answer);
+    }
+    return { topic:orig.topic, q:orig.q, type: isMulti ? 'multi' : 'single', options:optOrder.map(o=>o.text), answer:newAnswer };
   });
+}
+function isAnswered(idx){
+  const a = state.answers[idx];
+  return Array.isArray(a) ? a.length > 0 : a !== undefined;
 }
 
 /* ---------- Vùng / Chi nhánh dropdown ---------- */
@@ -545,15 +626,31 @@ function renderQuestion(){
   document.getElementById('qText').textContent = q.q;
   document.getElementById('progressFill').style.width = `${((state.current+1)/state.questions.length)*100}%`;
 
+  const hintEl = document.getElementById('qMultiHint');
+  hintEl.classList.toggle('hidden', q.type !== 'multi');
+
   const wrap = document.getElementById('qOptions');
   wrap.innerHTML = '';
   const letters = ['A','B','C','D','E'];
+  const isMulti = q.type === 'multi';
   q.options.forEach((opt,i)=>{
     const div = document.createElement('div');
-    div.className = 'option' + (state.answers[state.current]===i ? ' selected' : '');
-    div.innerHTML = `<div class="option-badge">${letters[i]}</div><div>${opt}</div>`;
+    const currentAns = state.answers[state.current];
+    const selected = isMulti ? (Array.isArray(currentAns) && currentAns.includes(i)) : (currentAns === i);
+    div.className = 'option' + (selected ? ' selected' : '');
+    const badgeClass = isMulti ? 'option-badge option-badge-square' : 'option-badge';
+    const badgeContent = isMulti ? (selected ? '✓' : '') : letters[i];
+    div.innerHTML = `<div class="${badgeClass}">${badgeContent}</div><div>${opt}</div>`;
     div.addEventListener('click', ()=>{
-      state.answers[state.current] = i;
+      if(isMulti){
+        let cur = Array.isArray(state.answers[state.current]) ? state.answers[state.current].slice() : [];
+        const pos = cur.indexOf(i);
+        if(pos >= 0) cur.splice(pos,1); else cur.push(i);
+        cur.sort((a,b)=>a-b);
+        state.answers[state.current] = cur;
+      } else {
+        state.answers[state.current] = i;
+      }
       renderQuestion();
       renderPalette();
     });
@@ -568,11 +665,13 @@ function renderQuestion(){
 function renderPalette(){
   const grid = document.getElementById('navGrid');
   grid.innerHTML = '';
+  const answeredCount = state.questions.filter((_,i)=>isAnswered(i)).length;
+  document.getElementById('navProgress').textContent = `${answeredCount}/${state.questions.length}`;
   state.questions.forEach((q,i)=>{
     const dot = document.createElement('div');
     let cls = 'nav-dot';
     if(i === state.current) cls += ' current';
-    else if(state.answers[i] !== undefined) cls += ' answered';
+    else if(isAnswered(i)) cls += ' answered';
     dot.className = cls;
     dot.textContent = i+1;
     dot.addEventListener('click', ()=>{
@@ -598,7 +697,7 @@ document.getElementById('btnPrev').addEventListener('click', ()=>{
 
 /* ---------- Nộp bài (modal xác nhận) ---------- */
 document.getElementById('btnSubmitTop').addEventListener('click', ()=>{
-  const unanswered = state.questions.length - state.answers.filter(a=>a!==undefined).length;
+  const unanswered = state.questions.length - state.questions.filter((_,i)=>isAnswered(i)).length;
   document.getElementById('confirmModalText').textContent = unanswered > 0
     ? `Bạn còn ${unanswered} câu chưa trả lời. Bạn có chắc muốn nộp bài không?`
     : `Bạn đã trả lời đủ ${state.questions.length} câu. Xác nhận nộp bài?`;
@@ -649,9 +748,19 @@ function finishQuiz(autoByViolation, autoByTime){
   let score = 0;
   const reviewRows = state.questions.map((q,i)=>{
     const chosen = state.answers[i];
-    const correct = chosen === q.answer;
+    let correct, chosenText, correctText;
+    if(q.type === 'multi'){
+      const chosenArr = Array.isArray(chosen) ? chosen.slice().sort((a,b)=>a-b) : [];
+      correct = JSON.stringify(chosenArr) === JSON.stringify(q.answer);
+      chosenText = chosenArr.length ? chosenArr.map(idx=>q.options[idx]).join('; ') : '(không trả lời)';
+      correctText = q.answer.map(idx=>q.options[idx]).join('; ');
+    } else {
+      correct = chosen === q.answer;
+      chosenText = chosen !== undefined ? q.options[chosen] : '(không trả lời)';
+      correctText = q.options[q.answer];
+    }
     if(correct) score++;
-    return {topic:q.topic, q:q.q, chosenText: chosen!==undefined ? q.options[chosen] : '(không trả lời)', correctText:q.options[q.answer], correct};
+    return {topic:q.topic, q:q.q, chosenText, correctText, correct};
   });
 
   document.getElementById('screen-quiz').classList.add('hidden');
